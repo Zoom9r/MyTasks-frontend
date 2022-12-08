@@ -1,0 +1,17 @@
+.cardTitle {
+    display: flex;
+    justify-content: space-between;
+
+    .cardNameStyles {
+        text-align: center;
+        font-family: cursive;
+        font-size: 25px;
+        margin-left: 5%;
+
+    }
+}
+
+#switchBtn {
+    display: flex;
+    justify-content: flex-end;
+}

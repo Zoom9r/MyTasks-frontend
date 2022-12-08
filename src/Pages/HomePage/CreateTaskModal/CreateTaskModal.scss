@@ -1,0 +1,42 @@
+.buttonStyleContainer {
+    font-size: 22px;
+}
+
+.modalContainer {
+    font-family: cursive;
+
+    .modalTitleStyles {
+        padding-left: 20px;
+        font-size: 28px;
+        color: rgb(0, 0, 0);
+        font-weight: 500;
+    }
+
+    .modalBodyStyles {
+        font-size: 20px;
+        font-family: system-ui;
+        color: rgb(0, 0, 0);
+        padding: 20px;
+
+    }
+
+}
+
+#createTaskBtn {
+    text-shadow: #000 1px 0px 1px, #000 0px 1px 1px, #000 0px -1px 1px, #000 -1px 0px 1px;
+    font-size: 20px;
+}
+
+.dropdownBtnList {
+    display: flex;
+    justify-content: start;
+
+}
+
+#dropdownBtn {
+    margin-right: 5%;
+}
+
+#dropdownNames {
+    padding-right: 1%;
+}

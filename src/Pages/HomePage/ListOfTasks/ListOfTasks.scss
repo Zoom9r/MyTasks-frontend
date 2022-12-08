@@ -1,0 +1,31 @@
+.mainIteemsContainer {
+
+    justify-self: center;
+
+    #h2 {
+        color: aliceblue;
+        text-shadow: #000 2px 0px 2px, #000 0px 2px 2px, #000 0px -2px 2px, #000 -2px 0px 2px;
+        margin-bottom: 2%;
+    }
+
+    .statusContainer {
+        display: flex;
+        justify-content: center;
+    }
+
+    .statusColumn {
+        margin: 10px;
+    }
+
+    #createStatusBtn {
+        font-size: 20px;
+        border-style: dashed;
+        width: auto;
+        max-width: 10%;
+        max-height: 30%;
+
+        text-shadow: #000 2px 0px 2px, #000 0px 2px 2px, #000 0px -2px 2px, #000 -2px 0px 2px;
+        height: 500px;
+        font-weight: 400;
+    }
+}

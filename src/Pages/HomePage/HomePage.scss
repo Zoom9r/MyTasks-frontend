@@ -1,0 +1,78 @@
+.homeContainer {
+  min-height: 100vh;
+  min-width: 100vh;
+  text-align: center;
+  font-family: cursive;
+  background-image: url('https://storge.pic2.me/upload/274/1_hi-tech.jpg');
+
+  #h1 {
+    color: #ffffff;
+    font-size: 60px;
+    font-weight: 500;
+
+  }
+
+  .mainIteemsContainer {
+
+    text-align: center;
+    align-items: center;
+
+
+    .cardContainer {
+      margin: 10px 0px 10px 0px;
+
+    }
+
+    .createBtnContainer {
+      padding-left: 50%;
+
+    }
+
+    .cardHeaderStyles {
+      padding-left: 20px;
+      font-family: system-ui;
+      font-size: 20px;
+      color: rgb(0, 0, 0);
+      font-weight: 600;
+
+    }
+
+    .cardBodyStyles {
+      font-size: 17px;
+      font-family: system-ui;
+      color: rgb(0, 0, 0);
+      padding: 20px;
+    }
+
+  }
+
+  .cardFooterContainer {
+    padding: 0px;
+
+    .buttonDeleteContainer {
+      color: #ece2e2;
+      font-size: 18px;
+      width: 100%;
+      height: 100%;
+      border-top-left-radius: 0%;
+      border-top-right-radius: 0%;
+    }
+  }
+
+  .editContainer {
+    min-height: 50px;
+
+  }
+
+  #selectListBtn {
+    font-size: 25px;
+    border-style: dashed;
+    border-width: 2px;
+    margin-top: 5%;
+    width: 60%;
+    color: aliceblue;
+    text-shadow: #000 2px 0px 2px, #000 0px 2px 2px, #000 0px -2px 2px, #000 -2px 0px 2px;
+    height: 500px;
+    font-weight: 400;
+  }
+}
