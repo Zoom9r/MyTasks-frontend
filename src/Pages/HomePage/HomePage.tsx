@@ -1,65 +1,37 @@
-import { CreateTask } from '../../Services/TaskService';
-import './HomePage.scss'
+import './HomePage.scss';
 import CreateTaskModal from './CreateTaskModal/CreateTaskModal';
-import Offcanv from './Offcanv/Offcanv';
+import Offcanv from '../Offcanv/Offcanv';
 import ListOfTasks from './ListOfTasks/ListOfTasks';
-import { GetListsDataById } from '../../Services/ListOfTasksService';
-import { ListOfTasksModel } from '../../Models/ListOfTasksModel';
-import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
+import { useContext } from 'react';
+import { ListContext } from '../../Context/ListContext';
+import ToastModal from '../ToastModal';
 
-function HomePage() {
+export default function HomePage() {
 
-  const [currentList, setCurrentList] = useState<ListOfTasksModel>(new ListOfTasksModel());
-  const [initialOffcanvOpen, setInitialOffcanvOpen] = useState<boolean>(false);
-
-  const fetchCurrentListData = async () => {
-    const selectedList = window.sessionStorage.getItem('selectedlist');
-    if (selectedList !== null && selectedList !== undefined) {
-
-      const listData = JSON.parse(selectedList);
-      const listResult = await GetListsDataById(listData.id);
-      setCurrentList(listResult);
-      return;
-    }
-  }
-
-  ////////////////// CREATE button ////////////////////
-
-  const onFinishCreateTask = (values: any) => {
-    CreateTask(values).then(() => {
-      window.location.reload();
-    });
-  };
-
-  useEffect(() => {
-    fetchCurrentListData();
-  }, [initialOffcanvOpen]);
+  const listContext = useContext(ListContext);
 
   return (
     <div className='homeContainer'>
-      <Offcanv initialOpen={initialOffcanvOpen} />
+      <Offcanv />
       <div className='mainIteemsContainer'>
-        <h1 id='h1'>My Tasks
-
-        </h1>
+        <h1 id='h1'>My Tasks</h1>
         <div className='createBtnContainer'>
-          <CreateTaskModal
-            onFinish={onFinishCreateTask}
-          ></CreateTaskModal>
+          <CreateTaskModal />
         </div>
-        {currentList.id != 0 ? <ListOfTasks /> :
-          <Button onClick={() => { setInitialOffcanvOpen(!initialOffcanvOpen) }} id='selectListBtn' variant="outline-primary">
+        {listContext.currentList.id != 0 ?
+          <ListOfTasks />
+          : <Button onClick={() => { listContext.setOffcanvOpen(true) }} id='selectListBtn' variant="outline-primary">
             Hi!
             Select the list you want to work with
           </Button>
-
         }
       </div>
+      <ToastModal />
     </div>
   );
 }
 
-export default HomePage;
+
 
 

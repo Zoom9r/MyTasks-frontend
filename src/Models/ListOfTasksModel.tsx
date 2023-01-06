@@ -3,7 +3,7 @@ import { TaskModel } from "./TaskModel";
 
 export class ListOfTasksModel {
 
-    id: number;
+    id: number
     listName: string
     statuses: Array<StatusModel>
     tasks: Array<TaskModel>
@@ -12,7 +12,6 @@ export class ListOfTasksModel {
         this.id = 0;
         this.listName = '';
         this.statuses = new Array<StatusModel>;
-        this.tasks = new Array<TaskModel>
+        this.tasks = new Array<TaskModel>;
     }
-
 }

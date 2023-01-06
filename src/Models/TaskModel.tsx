@@ -1,14 +1,15 @@
-import { ListOfTasksModel } from './ListOfTasksModel'
-import { StatusModel } from './StatusModel'
+import { ListOfTasksModel } from './ListOfTasksModel';
+import { StatusModel } from './StatusModel';
 
 export class TaskModel {
-    id: number;
-    title: string;
-    description: string;
-    statusId: number;
-    status: StatusModel;
-    listOfTasksId: number;
-    listOfTasks: ListOfTasksModel;
+    id: number
+    title: string
+    description: string
+    statusId: number
+    status: StatusModel
+    listOfTasksId: number
+    listOfTasks: ListOfTasksModel
+
     constructor() {
         this.id = 0;
         this.title = '';

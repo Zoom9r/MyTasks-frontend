@@ -1,41 +1,32 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button, Card, Dropdown, Form, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { ListOfTasksModel } from "../../../../../Models/ListOfTasksModel";
 import { StatusModel } from "../../../../../Models/StatusModel";
 import { TaskModel } from "../../../../../Models/TaskModel";
 import '../../../HomePage.scss';
-import { GetAllStatuses, GetStatus } from "../../../../../Services/StatusService";
 import './EditTask.scss';
+import { ToastContext } from '../../../../../Context/ToastContext';
 
 interface Props {
-  editFormVisible: boolean
-  task: TaskModel;
-  onFinishFormEdit: (task: TaskModel) => void;
-  onFinishFormDelete: (id: any) => void;
+  editFormVisible: boolean,
+  task: TaskModel,
+  status: StatusModel,
+  list: ListOfTasksModel,
+  onFinishFormEdit: (task: TaskModel) => void
 }
 
 export default function EditTaskForm(props: Props) {
 
-  const { register, handleSubmit } = useForm()
+  const toastContext = useContext(ToastContext);
 
-  const [allStatuses, setAllStatuses] = useState<StatusModel[]>([new StatusModel()]);
-  const [currentStatus, setCurrentStatus] = useState<StatusModel>(new StatusModel());
+  const [currentStatus, setCurrentStatus] = useState<StatusModel>(props.status);
+
+  const { register, handleSubmit } = useForm();
 
   useEffect(() => {
-    fetchCurrentStatusData();
-    fetchAllStatusesData();
+    setCurrentStatus(props.status);
   }, []);
-
-  const fetchCurrentStatusData = async () => {
-    const statusResult = await GetStatus(props.task.statusId);
-    setCurrentStatus(statusResult);
-  }
-
-  const fetchAllStatusesData = async () => {
-    const statusesResult = await GetAllStatuses();
-    setAllStatuses(statusesResult);
-  }
 
   const onHandleSubmit = (value: any) => {
     if (props.task != null) {
@@ -46,12 +37,21 @@ export default function EditTaskForm(props: Props) {
         statusId: currentStatus.id,
         status: new StatusModel(),
         listOfTasksId: props.task.listOfTasksId,
-        listOfTasks: new ListOfTasksModel(),
+        listOfTasks: new ListOfTasksModel()
+      };
+
+      if (props.status.id != currentStatus.id) {
+        toastContext.setMessage(`Task was successfully edited.(Status '${props.status.statusName}' changed to '${currentStatus.statusName}')`);
       }
+
+      else {
+        toastContext.setMessage(`Task was successfully edited.`);
+      }
+
+      toastContext.setToastState(true);
       props.onFinishFormEdit(editTask);
     }
   }
-
 
   return (
     <Card key={props.task.id} className='cardContainer'>
@@ -74,7 +74,7 @@ export default function EditTaskForm(props: Props) {
               {currentStatus.statusName}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              {allStatuses.map((status) => (
+              {props.list.statuses.map((status) => (
                 status.listOfTasksId == props.task.listOfTasksId ?
 
                   <Dropdown.Item
@@ -91,8 +91,7 @@ export default function EditTaskForm(props: Props) {
             </Dropdown.Menu>
           </Dropdown>
         </Card.Header>
-        <Form.Group
-        >
+        <Form.Group>
           <Form.Control
             className='cardBodyStyles'
             plaintext

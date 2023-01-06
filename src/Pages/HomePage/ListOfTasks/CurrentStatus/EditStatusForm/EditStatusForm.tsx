@@ -3,14 +3,18 @@ import { useForm } from "react-hook-form";
 import { StatusModel } from "../../../../../Models/StatusModel";
 import './EditStatus.scss';
 import { AiOutlineCheck } from "react-icons/ai";
+import { ToastContext } from '../../../../../Context/ToastContext';
+import { useContext } from "react";
 
 interface Props {
     status: StatusModel,
-    listId: number
-    onFinishStatusEdit: (status: StatusModel) => void;
+    listId: number,
+    onFinishStatusEdit: (status: StatusModel) => void
 }
 
-const EditStatusForm = (props: Props) => {
+export default function EditStatusForm(props: Props) {
+
+    const toastContext = useContext(ToastContext);
 
     const { register, handleSubmit } = useForm()
 
@@ -20,9 +24,11 @@ const EditStatusForm = (props: Props) => {
             id: props.status.id,
             statusName: value.statusName,
             listOfTasksId: props.listId
-        }
-        props.onFinishStatusEdit(editStatus);
+        };
 
+        toastContext.setMessage(`Status '${props.status.statusName}' was changed to '${value.statusName}'`);
+        toastContext.setToastState(true);
+        props.onFinishStatusEdit(editStatus);
     }
 
     return (
@@ -39,14 +45,11 @@ const EditStatusForm = (props: Props) => {
                         {...register("statusName", { required: "Required" })}
                     />
                 </Form.Group>
-
                 <Button variant="success" id='editBtn' onClick={handleSubmit(onHandleSubmit)} >
                     <AiOutlineCheck />
                 </Button>
             </Card.Title>
         </Form>
-
     );
 }
 
-export default EditStatusForm;

@@ -3,43 +3,51 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { StatusModel } from '../../../../../Models/StatusModel';
 import { TaskModel } from '../../../../../Models/TaskModel';
-import { DeleteStatus } from '../../../../../Services/StatusService';
-import { DeleteTask } from '../../../../../Services/TaskService';
+import { deleteStatus } from '../../../../../Services/StatusService';
+import { deleteTask } from '../../../../../Services/TaskService';
 import { AiFillDelete } from 'react-icons/ai';
-import './DeleteStatus.scss'
+import './DeleteStatus.scss';
+import { ToastContext } from '../../../../../Context/ToastContext';
+import { useContext } from "react";
 
 interface Props {
-  status: StatusModel
-  listTasks: TaskModel[]
-  updateListData: () => void;
+  status: StatusModel,
+  listTasks: TaskModel[],
+  updateListData: () => void
 }
 
-function DeleteStatusModal(props: Props) {
+export default function DeleteStatusModal(props: Props) {
+
+  const toastContext = useContext(ToastContext);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [tasks, setTasks] = useState<TaskModel[]>([new TaskModel()]);
 
-
   const fetchTasksData = async () => {
     setTasks(props.listTasks);
   }
+
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
   const handleShowDeleteModal = () => setShowDeleteModal(true);
 
-
   const onFinishDelete = async () => {
+
     fetchTasksData().then(() => {
       tasks.map(async (task) => {
         if (task.statusId == props.status.id) {
-          await DeleteTask(task.id);
+          await deleteTask(task.id);
         }
-      })
-    }).then(() => {
-      DeleteStatus(props.status.id).then(() => {
-        setShowDeleteModal(false);
-        props.updateListData();
-      })
+      });
     })
+      .then(() => {
+        deleteStatus(props.status.id)
+          .then(() => {
+            toastContext.setMessage(`Status '${props.status.statusName}' was deleted.`);
+            toastContext.setToastState(true);
+            setShowDeleteModal(false);
+            props.updateListData();
+          });
+      })
   }
 
   return (
@@ -66,4 +74,3 @@ function DeleteStatusModal(props: Props) {
   );
 }
 
-export default DeleteStatusModal;

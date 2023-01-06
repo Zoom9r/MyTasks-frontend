@@ -1,31 +1,50 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Dropdown, Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useForm } from 'react-hook-form';
 import { ListOfTasksModel } from '../../../Models/ListOfTasksModel';
-import { GetAllLists, GetListsDataById } from '../../../Services/ListOfTasksService';
-import './CreateTaskModal.scss'
+import './CreateTaskModal.scss';
 import { StatusModel } from '../../../Models/StatusModel';
-import { ListOfTasksModelDto } from '../../../Models/ListofTasksModelDto';
+import { ListContext } from '../../../Context/ListContext';
+import { createTask } from '../../../Services/TaskService';
+import { getListsDataById } from '../../../Services/ListOfTasksService';
+import { ToastContext } from '../../../Context/ToastContext';
 
-interface Props {
-  onFinish: (task: any) => void;
-}
+export default function CreateTaskModal() {
 
-export default function CreateTaskModal(props: Props) {
+  const listContext = useContext(ListContext);
+  const toastContext = useContext(ToastContext);
 
-  //// works on entering data, transferring them to the method, clearing fields ////
+  // useState for list that user pick while creating task.
+  const [chosenList, setChosenList] = useState<ListOfTasksModel>(new ListOfTasksModel());
+
+  // useState for all list's statuses.
+  const [allListStatuses, setAllListStatuses] = useState<StatusModel[]>(listContext.currentList.statuses);
+
+  // useState for choosen status.
+  const [chosenStatus, setChosenStatus] = useState<StatusModel>(new StatusModel());
+
+  useEffect(() => {
+    listContext.fetchAllListsNames();
+  }, []);
+
+  const fetchChosenListData = async (listId: number) => {
+    const fullListData = await getListsDataById(listId);
+    setChosenList(fullListData);
+    setAllListStatuses(fullListData.statuses);
+  }
+
+  // Works on entering data, transferring them to the method, clearing fields.
   const { register, handleSubmit, reset } = useForm(
     {
       defaultValues: {
         title: "",
-        description: "",
+        description: ""
       }
     }
   )
 
-  //// closing/opening modal ///
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleCloseCreateModal = () => {
@@ -35,70 +54,27 @@ export default function CreateTaskModal(props: Props) {
 
   const handleShowCreateModal = () => setShowCreateModal(true);
 
-  //// input confirmation ////
   const onHandleSubmit = (value: any) => {
-
-    const newTask: any = {
-      title: value.title,
-      description: value.description,
-      listOfTasksId: chosenList.id != 0 ? chosenList.id : currentList.id,
-      statusId: chosenStatus.id
-    };
-    props.onFinish(newTask);
-    setShowCreateModal(false);
-    reset();
-  }
-
-  ///////// FETCHING LIST //////////////
-
-  // useState for all fetched lists
-  const [allLists, setAllLists] = useState<ListOfTasksModelDto[]>([new ListOfTasksModelDto()]);
-
-  // useState for list where we are now,like default value(if we already inside some list)
-  const [currentList, setCurrentList] = useState<ListOfTasksModel>(new ListOfTasksModel());
-
-  // useState for list that user pick
-  const [chosenList, setChosenList] = useState<ListOfTasksModel>(new ListOfTasksModel());
-
-  const [allListStatuses, setAllListStatuses] = useState<StatusModel[]>([new StatusModel()]);
-  const [chosenStatus, setChosenStatus] = useState<StatusModel>(new StatusModel());
-
-  const fetchListsData = async () => {
-    const listResult = await GetAllLists();
-    setAllLists(listResult);
-  }
-
-  const fetchCurrentListData = async () => {
-    const currentListData = window.sessionStorage.getItem('selectedlist');
-    if (currentListData !== null && currentListData !== undefined) {
-      try {
-        const listData = JSON.parse(currentListData)
-        setCurrentList(listData);
-        const fullListData = await GetListsDataById(listData.id);
-
-        setAllListStatuses(fullListData.statuses);
-        return;
+    if (chosenStatus.id != 0) {
+      const newTask: any = {
+        title: value.title,
+        description: value.description,
+        listOfTasksId: chosenList.id != 0 ? chosenList.id : listContext.currentList.id,
+        statusId: chosenStatus.id
       }
-      catch (error) {
-        console.log(error);
-      }
+
+      createTask(newTask).then(() => {
+        toastContext.setMessage(`Task '${value.title}' was created.`);
+        toastContext.setToastState(true);
+        listContext.fetchCurrentListData();
+      });
+      setShowCreateModal(false);
+      reset();
+      setChosenStatus(new StatusModel());
     }
   }
 
-  const fetchChosenListData = async (listId: number) => {
-    const fulllistData = await GetListsDataById(listId);
-    setChosenList(fulllistData);
-    setAllListStatuses(fulllistData.statuses);
-  }
-
-  useEffect(() => {
-    fetchListsData();
-    fetchCurrentListData();
-  }, []);
-
-
   return (
-
     <>
       <Button onClick={handleShowCreateModal} variant="primary">
         <span id='createTaskBtn'>
@@ -129,9 +105,7 @@ export default function CreateTaskModal(props: Props) {
               />
             </Form.Group>
 
-            <Form.Group
-              className="mb-3"
-            >
+            <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
               <Form.Control
                 as="textarea"
@@ -147,16 +121,16 @@ export default function CreateTaskModal(props: Props) {
               <div id='dropdownNames'> List name:</div>
               <Dropdown id='dropdownBtn'>
                 <Dropdown.Toggle variant="secondary" >
-                  {currentList.id != 0 && chosenList.id == 0 ? currentList.listName : chosenList.id != 0 ? chosenList.listName : "Select list"}
+                  {listContext.currentList.id != 0 && chosenList.id == 0 ? listContext.currentList.listName : chosenList.id != 0 ? chosenList.listName : "Select list"}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  {allLists.map((list) => (
+                  {listContext.allListNames.map((list) => (
                     <Dropdown.Item key={list.id} onClick={() => { fetchChosenListData(list.id) }}>{list.listName}</Dropdown.Item>
                   ))}
                 </Dropdown.Menu>
               </Dropdown>
 
-              {chosenList.id == 0 && currentList.id != 0 ?
+              {chosenList.id == 0 && listContext.currentList.id != 0 ?
                 <>
                   <div id='dropdownNames'> Status:</div>
                   <Dropdown>
@@ -164,7 +138,7 @@ export default function CreateTaskModal(props: Props) {
                       {chosenStatus.id != 0 ? chosenStatus.statusName : "Select status"}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                      {allListStatuses.map((status: StatusModel) => (
+                      {listContext.currentList.statuses.map((status: StatusModel) => (
                         <Dropdown.Item
                           key={status.id}
                           onClick={() => { setChosenStatus(status); }}
@@ -213,7 +187,6 @@ export default function CreateTaskModal(props: Props) {
         </Modal>
       </Form>
     </>
-
   );
 }
 

@@ -3,16 +3,19 @@ import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useForm } from 'react-hook-form';
-import { ListOfTasksModel } from '../../../Models/ListOfTasksModel';
 import { StatusModel } from '../../../Models/StatusModel';
 import './ListOfTasks.scss';
+import { useContext } from 'react';
+import { ListContext } from '../../../Context/ListContext';
+import { createStatus } from '../../../Services/StatusService';
+import { ToastContext } from '../../../Context/ToastContext';
 
-interface Props {
-  onFinish: (status: any) => void;
-  currentList: ListOfTasksModel
-}
+export default function CreateStatusModal() {
 
-export default function CreateStatusModal(props: Props) {
+  const listContext = useContext(ListContext);
+  const toastContext = useContext(ToastContext);
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const { register, handleSubmit, reset } = useForm(
     {
@@ -21,8 +24,6 @@ export default function CreateStatusModal(props: Props) {
       }
     }
   )
-
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleCloseCreateModal = () => {
     setShowCreateModal(false);
@@ -35,11 +36,16 @@ export default function CreateStatusModal(props: Props) {
     const newStatus: StatusModel = {
       id: 0,
       statusName: value.statusName,
-      listOfTasksId: props.currentList.id
-    }
-    props.onFinish(newStatus);
-    setShowCreateModal(false);
-    reset();
+      listOfTasksId: listContext.currentList.id
+    };
+
+    createStatus(newStatus).then(() => {
+      toastContext.setMessage(`Status '${value.statusName}' was created!`);
+      toastContext.setToastState(true);
+      listContext.fetchCurrentListData();
+      setShowCreateModal(false);
+      reset();
+    })
   }
 
   return (
@@ -55,7 +61,7 @@ export default function CreateStatusModal(props: Props) {
           aria-labelledby="contained-modal-title-vcenter"
           centered>
           <Modal.Header>
-            <Modal.Title className='modalTitleStyles'>Creating new status for '{props.currentList.listName}' list...</Modal.Title>
+            <Modal.Title className='modalTitleStyles'>Creating new status for '{listContext.currentList.listName}' list...</Modal.Title>
           </Modal.Header>
           <Modal.Body className='modalBodyStyles'>
 

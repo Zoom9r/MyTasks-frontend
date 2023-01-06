@@ -1,6 +1,7 @@
+
 export class ListOfTasksModelDto {
 
-    id: number;
+    id: number
     listName: string
 
     constructor() {

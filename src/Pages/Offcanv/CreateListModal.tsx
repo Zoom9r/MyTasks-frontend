@@ -3,8 +3,10 @@ import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useForm } from 'react-hook-form';
-import { ListOfTasksModel } from '../../../Models/ListOfTasksModel';
-import { CreateList } from '../../../Services/ListOfTasksService';
+import { ListOfTasksModel } from '../../Models/ListOfTasksModel';
+import { createList } from '../../Services/ListOfTasksService';
+import { useContext } from 'react';
+import { ToastContext } from '../../Context/ToastContext';
 
 interface Props {
   onFinishCreate: () => void;
@@ -12,15 +14,17 @@ interface Props {
 
 export default function CreateListModal(props: Props) {
 
+  const toast = useContext(ToastContext);
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
   const { register, handleSubmit, reset } = useForm(
     {
       defaultValues: {
-        listName: ""
+        listName: ''
       }
     }
   )
-
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleCloseCreateModal = () => {
     setShowCreateModal(false);
@@ -35,17 +39,19 @@ export default function CreateListModal(props: Props) {
       listName: value.listName,
       statuses: [],
       tasks: []
-    }
-    await CreateList(newList).then(() => {
+    };
 
-      props.onFinishCreate();
-      setShowCreateModal(false);
-      reset();
-    })
+    await createList(newList)
+      .then(() => {
+        toast.setMessage(`List '${value.listName}' was created!`);
+        toast.setToastState(true);
+        props.onFinishCreate();
+        setShowCreateModal(false);
+        reset();
+      })
   };
 
   return (
-
     <>
       <Button variant="warning" onClick={handleShowCreateListModal}>
         <span className='buttonStyleContainer'>
@@ -63,7 +69,6 @@ export default function CreateListModal(props: Props) {
             <Modal.Title className='modalTitleStyles'>Creating new list...</Modal.Title>
           </Modal.Header>
           <Modal.Body className='modalBodyStyles'>
-
             <Form.Group className="mb-3">
               <Form.Label>List name:</Form.Label>
               <Form.Control
@@ -75,7 +80,6 @@ export default function CreateListModal(props: Props) {
                 {...register("listName", { required: "Required" })}
               />
             </Form.Group>
-
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseCreateModal}>
@@ -88,6 +92,8 @@ export default function CreateListModal(props: Props) {
         </Modal>
       </Form>
     </>
-
   );
 }
+
+
+
