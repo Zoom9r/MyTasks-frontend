@@ -6,8 +6,8 @@ import { useForm } from 'react-hook-form';
 import { ListOfTasksModel } from '../../Models/ListOfTasksModel';
 import { ListOfTasksModelDto } from '../../Models/ListofTasksModelDto';
 import { editList } from '../../Services/ListOfTasksService'
-import './EditList.scss'
 import { ToastContext } from '../../Context/ToastContext';
+import './EditList.scss';
 
 interface Props {
   list: ListOfTasksModelDto
@@ -19,6 +19,8 @@ export default function EditListModal(props: Props) {
   const toast = useContext(ToastContext);
 
   const [showEditModal, setShowEditModal] = useState(false);
+  // useState for validating what user enters
+  const [validatedTitle, setValidatedTitle] = useState(false);
 
   const { register, handleSubmit, reset } = useForm(
     {
@@ -33,22 +35,35 @@ export default function EditListModal(props: Props) {
     reset();
   };
 
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  const titleRegex: RegExp = /^.{1,20}$/;
+
   const handleShowCreateListModal = () => setShowEditModal(true);
 
   const onHandleSubmit = async (value: any) => {
-    const newList: ListOfTasksModel = {
-      id: props.list.id,
-      listName: value.listName,
-      statuses: [],
-      tasks: []
-    };
-    await editList(newList)
-      .then(() => {
-        toast.setMessage(`List name '${props.list.listName}' was changed to ${value.listName}`);
-        toast.setToastState(true);
-        props.onFinishEdit();
-        setShowEditModal(false);
-      });
+    if (titleRegex.test(value.listName.toString())) {
+
+      const newList: ListOfTasksModel = {
+        id: props.list.id,
+        listName: value.listName,
+        statuses: [],
+        tasks: []
+      };
+      await editList(newList)
+        .then(() => {
+          if (props.list.listName != value.listName) {
+            toast.setMessage(`List name '${props.list.listName}' was changed to ${value.listName}`);
+            toast.setToastState(true);
+          }
+          props.onFinishEdit();
+          setShowEditModal(false);
+        });
+    }
+    else {
+      setValidatedTitle(true);
+      sleep(5000).then(() => { setValidatedTitle(false) });
+    }
   }
 
   return (
@@ -72,10 +87,13 @@ export default function EditListModal(props: Props) {
               <Form.Control
                 placeholder="Input new name here"
                 autoFocus
-                pattern="^.{2,40}$"
                 required={true}
-                {...register("listName", { required: "Required" })}
+                isInvalid={validatedTitle}
+                {...register("listName")}
               />
+              <Form.Control.Feedback type="invalid">
+                The field must contain between 1 and 20 characters
+              </Form.Control.Feedback>
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>

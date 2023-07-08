@@ -4,24 +4,24 @@ import CreateListModal from './CreateListModal';
 import DeleteListModal from './DeleteListModal';
 import { ListOfTasksModelDto } from '../../Models/ListofTasksModelDto';
 import EditListModal from './EditListModal';
-import './Offcanv.scss'
 import { AiOutlineMenu } from "react-icons/ai";
 import { useContext } from 'react';
 import { ListContext } from '../../Context/ListContext';
+import './Offcanv.scss';
 
 export default function Offcanv() {
 
-    const listt = useContext(ListContext);
+    const listContext = useContext(ListContext);
 
-    const handleShow = () => listt.setOffcanvOpen(true);
-    const handleClose = () => listt.setOffcanvOpen(false);
+    const handleShow = () => listContext.setOffcanvOpen(true);
+    const handleClose = () => listContext.setOffcanvOpen(false);
 
     const fetchListsNames = async () => {
-        listt.fetchAllListsNames();
+        listContext.fetchAllListsNames();
     }
 
     const onListSelected = async (list: ListOfTasksModelDto) => {
-        listt.fetchCurrentListData(list.id);
+        listContext.fetchCurrentListData(list.id);
     }
 
     useEffect(() => {
@@ -34,7 +34,7 @@ export default function Offcanv() {
                 <AiOutlineMenu onClick={handleShow} className='menuButton' type='button' />
             </div>
 
-            <Offcanvas show={listt.offcanvOpen} onHide={handleClose} className='offcanvContainer'>
+            <Offcanvas show={listContext.offcanvOpen} onHide={handleClose} className='offcanvContainer'>
                 <Offcanvas.Header id='offCavnasHeader' closeButton>
                     <Offcanvas.Title ><h2 id='offCavnasTitle'>Available lists</h2></Offcanvas.Title>
                 </Offcanvas.Header>
@@ -44,7 +44,7 @@ export default function Offcanv() {
                             onFinishCreate={fetchListsNames}
                         />
                     </span>
-                    {listt.allListNames.map((list) => (
+                    {listContext.allListNames.map((list) => (
 
                         <ButtonGroup key={list.id} id='listGroup'>
                             <Button id='listNameBtn' variant="light" onClick={() => { onListSelected(list); handleClose(); }}>

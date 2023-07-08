@@ -26,15 +26,38 @@
     font-size: 20px;
 }
 
-.dropdownBtnList {
+.dropdownBtnContainer {
     display: flex;
     justify-content: start;
 }
 
-#dropdownBtn {
+#dropdownListBtn {
     margin-right: 5%;
+    width: 25%;
+}
+
+#dropdownStatusBtn {
+    margin-right: 5%;
+    width: 30%;
+}
+
+#dropdownToggle {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#dropdownToggleSpan {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #dropdownNames {
     padding-right: 1%;
+
+}
+
+#taskValidationStyle {
+    font-size: medium;
+    color: #fa1d1d;
 }

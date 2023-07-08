@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import { Row } from 'react-bootstrap';
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
-import './ToastModal.scss';
 import { useContext } from 'react';
 import { ToastContext } from '../Context/ToastContext';
+import './ToastModal.scss';
 
 function CreateToast() {
 

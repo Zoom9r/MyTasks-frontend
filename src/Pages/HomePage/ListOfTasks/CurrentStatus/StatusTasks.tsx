@@ -7,10 +7,11 @@ import { deleteTask, editTask } from "../../../../Services/TaskService";
 import EditTaskForm from "./EditTaskForm/EditTaskForm";
 import DeleteStatusModal from "./DeleteStatusModal/DeleteStatusModal";
 import EditStatusForm from "./EditStatusForm/EditStatusForm";
-import './StatusTasks.scss';
 import { AiOutlineSwap } from "react-icons/ai";
 import { ListContext } from '../../../../Context/ListContext';
 import { ToastContext } from '../../../../Context/ToastContext';
+import './StatusTasks.scss';
+import '../../HomePage.scss';
 
 export default function StatusTasks() {
 
@@ -55,14 +56,14 @@ export default function StatusTasks() {
                         <Card.Title className="cardTitle">
                             {status != statusToChange ?
                                 <>
-                                    <Form onClick={() => { setStatusToChange(status); }}>
+                                    <Form onClick={() => { setStatusToChange(status); }} id="statusFormStyles">
                                         <Form.Group>
                                             <Form.Control
                                                 className='cardNameStyles'
                                                 plaintext
                                                 required={true}
                                                 defaultValue={status.statusName}
-                                                pattern="^.{0,400}$" />
+                                            />
                                         </Form.Group>
                                     </Form>
                                     <DeleteStatusModal
@@ -89,16 +90,8 @@ export default function StatusTasks() {
                                             <Card key={task.id} className='cardContainer'>
                                                 <Form onClick={() => { setEditTaskFormVisible(true); setTaskToChange(task); }} >
                                                     <Card.Header className="cardTitle">
-                                                        <Form.Group as={Row} >
-                                                            <Form.Control
-                                                                className='cardHeaderStyles'
-                                                                plaintext
-                                                                type="text"
-                                                                autoFocus
-                                                                pattern="^.{0,40}$"
-                                                                defaultValue={task.title}
-                                                                required={true}
-                                                            />
+                                                        <Form.Group as={Row} id="statusFormStyles">
+                                                            <div className='cardHeaderStyles'>{task.title}</div>
                                                         </Form.Group>
                                                         <span id='switchBtn'>
                                                             <Button variant="none" onClick={() => { setEditTaskFormVisible(true); setTaskToChange(task); }}>
@@ -106,15 +99,7 @@ export default function StatusTasks() {
                                                             </Button>
                                                         </span>
                                                     </Card.Header>
-                                                    <Form.Group>
-                                                        <Form.Control
-                                                            className='cardBodyStyles'
-                                                            plaintext
-                                                            required={true}
-                                                            defaultValue={task.description}
-                                                            pattern="^.{0,400}$"
-                                                        />
-                                                    </Form.Group>
+                                                    <div className='cardBodyStyles'>{task.description}</div>
                                                 </Form>
                                                 <Card.Footer onClick={() => { onFinishDeleteTask(task) }} className="cardFooterContainer">
                                                     <Button variant="secondary" className='buttonDeleteContainer'>
@@ -129,29 +114,18 @@ export default function StatusTasks() {
                                         {listContext.currentList.tasks.map(task => (
                                             task != taskToChange && task.statusId == status.id ?
                                                 <Card key={task.id} className='cardContainer'>
-                                                    <Form onClick={() => { setEditTaskFormVisible(true); setTaskToChange(task); }}>
-                                                        <Card.Header>
-                                                            <Form.Group as={Row} >
-                                                                <Form.Control
-                                                                    className='cardHeaderStyles'
-                                                                    plaintext
-                                                                    placeholder="Input your title here"
-                                                                    autoFocus
-                                                                    pattern="^.{0,40}$"
-                                                                    defaultValue={task.title}
-                                                                    required={true}
-                                                                />
+                                                    <Form onClick={() => { setEditTaskFormVisible(true); setTaskToChange(task); }} >
+                                                        <Card.Header className="cardTitle">
+                                                            <Form.Group as={Row} id="statusFormStyles">
+                                                                <div className='cardHeaderStyles'>{task.title}</div>
                                                             </Form.Group>
+                                                            <span id='switchBtn'>
+                                                                <Button variant="none" onClick={() => { setEditTaskFormVisible(true); setTaskToChange(task); }}>
+                                                                    <AiOutlineSwap />
+                                                                </Button>
+                                                            </span>
                                                         </Card.Header>
-                                                        <Form.Group>
-                                                            <Form.Control
-                                                                className='cardBodyStyles'
-                                                                plaintext
-                                                                required={true}
-                                                                defaultValue={task.description}
-                                                                pattern="^.{0,400}$"
-                                                            />
-                                                        </Form.Group>
+                                                        <div className='cardBodyStyles'>{task.description}</div>
                                                     </Form>
                                                     <Card.Footer onClick={() => { onFinishDeleteTask(task) }} className="cardFooterContainer">
                                                         <Button variant="secondary" className='buttonDeleteContainer'>

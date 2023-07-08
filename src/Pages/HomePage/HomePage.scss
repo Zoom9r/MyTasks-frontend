@@ -17,12 +17,10 @@
 
     .cardContainer {
       margin: 10px 0px 10px 0px;
-
     }
 
     .createBtnContainer {
       padding-left: 50%;
-
     }
 
     .cardHeaderStyles {
@@ -31,6 +29,8 @@
       font-size: 20px;
       color: rgb(0, 0, 0);
       font-weight: 600;
+      text-overflow: ellipsis;
+      text-align: left;
     }
 
     .cardBodyStyles {
@@ -38,6 +38,10 @@
       font-family: system-ui;
       color: rgb(0, 0, 0);
       padding: 20px;
+      overflow: visible;
+      word-break: break-all;
+      overflow-wrap: break-word;
+      text-align: left;
     }
   }
 

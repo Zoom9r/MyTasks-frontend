@@ -4,12 +4,12 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useForm } from 'react-hook-form';
 import { ListOfTasksModel } from '../../../Models/ListOfTasksModel';
-import './CreateTaskModal.scss';
 import { StatusModel } from '../../../Models/StatusModel';
 import { ListContext } from '../../../Context/ListContext';
 import { createTask } from '../../../Services/TaskService';
 import { getListsDataById } from '../../../Services/ListOfTasksService';
 import { ToastContext } from '../../../Context/ToastContext';
+import './CreateTaskModal.scss';
 
 export default function CreateTaskModal() {
 
@@ -24,6 +24,11 @@ export default function CreateTaskModal() {
 
   // useState for choosen status.
   const [chosenStatus, setChosenStatus] = useState<StatusModel>(new StatusModel());
+
+  // useStates for validating what user enters
+  const [validatedTitle, setValidatedTitle] = useState(false);
+  const [validatedDescription, setValidatedDescription] = useState(false);
+  const [validatedListAndStatus, setValidatedListAndStatus] = useState(false);
 
   useEffect(() => {
     listContext.fetchAllListsNames();
@@ -54,8 +59,14 @@ export default function CreateTaskModal() {
 
   const handleShowCreateModal = () => setShowCreateModal(true);
 
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  const titleRegex: RegExp = /^.{1,30}$/;
+  const descriptionRegex: RegExp = /^.{1,400}$/;
+
   const onHandleSubmit = (value: any) => {
-    if (chosenStatus.id != 0) {
+
+    if (titleRegex.test(value.title.toString()) && descriptionRegex.test(value.description.toString()) && chosenStatus.id != 0) {
       const newTask: any = {
         title: value.title,
         description: value.description,
@@ -71,6 +82,23 @@ export default function CreateTaskModal() {
       setShowCreateModal(false);
       reset();
       setChosenStatus(new StatusModel());
+      setValidatedTitle(false);
+      setValidatedDescription(false);
+      setValidatedListAndStatus(false);
+    }
+    else {
+      if (titleRegex.test(value.title.toString()) == false) {
+        setValidatedTitle(true);
+        sleep(5000).then(() => { setValidatedTitle(false) });
+      }
+      if (descriptionRegex.test(value.description.toString()) == false) {
+        setValidatedDescription(true);
+        sleep(5000).then(() => { setValidatedDescription(false) });
+      }
+      if (listContext.currentList.id == 0 && chosenList.id == 0 || chosenStatus.id == 0) {
+        setValidatedListAndStatus(true);
+        sleep(5000).then(() => { setValidatedListAndStatus(false) });
+      }
     }
   }
 
@@ -93,16 +121,19 @@ export default function CreateTaskModal() {
           </Modal.Header>
           <Modal.Body className='modalBodyStyles'>
 
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
               <Form.Control
                 placeholder="Input your title here"
                 autoFocus
-                pattern="^.{2,40}$"
-                required={true}
+                required
                 defaultValue=''
-                {...register("title", { required: "Required" })}
+                isInvalid={validatedTitle}
+                {...register("title")}
               />
+              <Form.Control.Feedback type="invalid" id='taskValidationStyle'>
+                The field must contain between 1 and 30 characters
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -113,15 +144,20 @@ export default function CreateTaskModal() {
                 placeholder="Input task description here"
                 required={true}
                 defaultValue=''
-                pattern="^.{3,400}$"
-                {...register("description", { required: "Required" })}
+                isInvalid={validatedDescription}
+                {...register("description")}
               />
+              <Form.Control.Feedback type="invalid" id='taskValidationStyle'>
+                The field must contain between 1 and 400 characters
+              </Form.Control.Feedback>
             </Form.Group>
-            <div className='dropdownBtnList'>
+            <div className='dropdownBtnContainer'>
               <div id='dropdownNames'> List name:</div>
-              <Dropdown id='dropdownBtn'>
-                <Dropdown.Toggle variant="secondary" >
-                  {listContext.currentList.id != 0 && chosenList.id == 0 ? listContext.currentList.listName : chosenList.id != 0 ? chosenList.listName : "Select list"}
+              <Dropdown id='dropdownListBtn'>
+                <Dropdown.Toggle variant="secondary" id='dropdownToggle'>
+                  <span id="dropdownToggleSpan">
+                    {listContext.currentList.id != 0 && chosenList.id == 0 ? listContext.currentList.listName : chosenList.id != 0 ? chosenList.listName : "Select list"}
+                    </span>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   {listContext.allListNames.map((list) => (
@@ -133,9 +169,11 @@ export default function CreateTaskModal() {
               {chosenList.id == 0 && listContext.currentList.id != 0 ?
                 <>
                   <div id='dropdownNames'> Status:</div>
-                  <Dropdown>
-                    <Dropdown.Toggle variant="secondary">
+                  <Dropdown id='dropdownStatusBtn'>
+                    <Dropdown.Toggle variant="secondary" id='dropdownToggle'>
+                    <span id="dropdownToggleSpan">
                       {chosenStatus.id != 0 ? chosenStatus.statusName : "Select status"}
+                      </span>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       {listContext.currentList.statuses.map((status: StatusModel) => (
@@ -154,9 +192,11 @@ export default function CreateTaskModal() {
               {chosenList.id != 0 ?
                 <>
                   <div id='dropdownNames'> Status:</div>
-                  <Dropdown>
-                    <Dropdown.Toggle variant="secondary">
+                  <Dropdown id='dropdownStatusBtn'>
+                    <Dropdown.Toggle variant="secondary" id='dropdownToggle'>
+                    <span id="dropdownToggleSpan">
                       {chosenStatus.id != 0 && chosenStatus.listOfTasksId == chosenList.id ? chosenStatus.statusName : "Select status"}
+                      </span>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       {allListStatuses.map((status) => (
@@ -174,6 +214,9 @@ export default function CreateTaskModal() {
                   </Dropdown>
                 </>
                 : null}
+            </div>
+            <div id='taskValidationStyle'>
+              {validatedListAndStatus == true ? "Please choose task's list and status" : null}
             </div>
           </Modal.Body>
           <Modal.Footer>

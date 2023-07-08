@@ -35,7 +35,7 @@
 }
 
 #listGroup {
-    min-width: 100%;
+    width: 100%;
     border: 2px solid rgb(87, 81, 81);
     border-start-end-radius: 4% 30%;
     border-end-end-radius: 4% 30%;
@@ -45,9 +45,11 @@
 
 #listNameBtn {
     padding-left: 5%;
+    padding-right: 0%;
     overflow: hidden;
     font-size: 20px;
     align-self: center;
+    text-overflow: ellipsis;
 }
 
 #listModifyButtons {

@@ -2,3 +2,14 @@
     display: flex;
     justify-content: space-between;
 }
+
+#taskValidationStyle {
+    font-size: medium;
+    color: #fa1d1d;
+}
+
+#dropdownStyle {
+    width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

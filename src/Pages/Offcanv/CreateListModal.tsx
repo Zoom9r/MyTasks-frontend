@@ -17,6 +17,8 @@ export default function CreateListModal(props: Props) {
   const toast = useContext(ToastContext);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  // useState for validating what user enters
+  const [validatedTitle, setValidatedTitle] = useState(false);
 
   const { register, handleSubmit, reset } = useForm(
     {
@@ -33,22 +35,33 @@ export default function CreateListModal(props: Props) {
 
   const handleShowCreateListModal = () => setShowCreateModal(true);
 
-  const onHandleSubmit = async (value: any) => {
-    const newList: ListOfTasksModel = {
-      id: 0,
-      listName: value.listName,
-      statuses: [],
-      tasks: []
-    };
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-    await createList(newList)
-      .then(() => {
-        toast.setMessage(`List '${value.listName}' was created!`);
-        toast.setToastState(true);
-        props.onFinishCreate();
-        setShowCreateModal(false);
-        reset();
-      })
+  const titleRegex: RegExp = /^.{1,20}$/;
+
+  const onHandleSubmit = async (value: any) => {
+    if (titleRegex.test(value.listName.toString())) {
+
+      const newList: ListOfTasksModel = {
+        id: 0,
+        listName: value.listName,
+        statuses: [],
+        tasks: []
+      };
+
+      await createList(newList)
+        .then(() => {
+          toast.setMessage(`List '${value.listName}' was created!`);
+          toast.setToastState(true);
+          props.onFinishCreate();
+          setShowCreateModal(false);
+          reset();
+        })
+    }
+    else {
+      setValidatedTitle(true);
+      sleep(5000).then(() => { setValidatedTitle(false) });
+    }
   };
 
   return (
@@ -74,11 +87,14 @@ export default function CreateListModal(props: Props) {
               <Form.Control
                 placeholder="Input name here"
                 autoFocus
-                pattern="^.{2,40}$"
                 required={true}
                 defaultValue=''
-                {...register("listName", { required: "Required" })}
+                isInvalid={validatedTitle}
+                {...register("listName")}
               />
+              <Form.Control.Feedback type="invalid">
+                The field must contain between 1 and 20 characters
+              </Form.Control.Feedback>
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>

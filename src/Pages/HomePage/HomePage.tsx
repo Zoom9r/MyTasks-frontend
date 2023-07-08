@@ -1,4 +1,3 @@
-import './HomePage.scss';
 import CreateTaskModal from './CreateTaskModal/CreateTaskModal';
 import Offcanv from '../Offcanv/Offcanv';
 import ListOfTasks from './ListOfTasks/ListOfTasks';
@@ -6,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import { useContext } from 'react';
 import { ListContext } from '../../Context/ListContext';
 import ToastModal from '../ToastModal';
+import './HomePage.scss';
 
 export default function HomePage() {
 
@@ -13,6 +13,7 @@ export default function HomePage() {
 
   return (
     <div className='homeContainer'>
+      <ToastModal />
       <Offcanv />
       <div className='mainIteemsContainer'>
         <h1 id='h1'>My Tasks</h1>
@@ -27,7 +28,6 @@ export default function HomePage() {
           </Button>
         }
       </div>
-      <ToastModal />
     </div>
   );
 }

@@ -8,10 +8,10 @@ import { TaskModel } from '../../Models/TaskModel';
 import { deleteList, getListsDataById } from '../../Services/ListOfTasksService';
 import { deleteStatus } from '../../Services/StatusService';
 import { deleteTask } from '../../Services/TaskService';
-import './DeleteList.scss';
 import { useContext } from 'react';
 import { ListContext } from '../../Context/ListContext';
 import { ToastContext } from '../../Context/ToastContext';
+import './DeleteList.scss';
 
 interface Props {
     list: ListOfTasksModelDto
@@ -20,7 +20,7 @@ interface Props {
 
 export default function DeleteListModal(props: Props) {
 
-    const listt = useContext(ListContext);
+    const listContext = useContext(ListContext);
     const toast = useContext(ToastContext);
 
     const [showDeleteListModal, setShowDeleteListModal] = useState(false);
@@ -38,7 +38,7 @@ export default function DeleteListModal(props: Props) {
         deleteAllListTasks(list).then(() => {
             deleteAllListStatuses(list)
                 .then(() => {
-                    listt.setCurrentList(new ListOfTasksModel());
+                    listContext.setCurrentList(new ListOfTasksModel());
                     deleteList(props.list.id)
                         .then(() => {
                             setShowDeleteListModal(false);
@@ -77,7 +77,7 @@ export default function DeleteListModal(props: Props) {
                         Cancel
                     </Button>
                     <Button variant="primary" onClick={() => {
-                        fetchListsDataById()
+                        fetchListsDataById();
                     }}>
                         Delete
                     </Button>

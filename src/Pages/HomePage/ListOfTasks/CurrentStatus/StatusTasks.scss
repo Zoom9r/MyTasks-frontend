@@ -7,14 +7,26 @@
         font-family: cursive;
         font-size: 25px;
         margin-left: 5%;
+        text-overflow: ellipsis;
     }
 }
 
 .statusColumn {
- min-width: 20%;
+    min-width: 20%;
 }
 
 #switchBtn {
     display: flex;
     justify-content: flex-end;
+    overflow: hidden;
+}
+
+#statusFormStyles {
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#editCardTitle {
+    justify-content: left;
 }

@@ -4,11 +4,11 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useForm } from 'react-hook-form';
 import { StatusModel } from '../../../Models/StatusModel';
-import './ListOfTasks.scss';
 import { useContext } from 'react';
 import { ListContext } from '../../../Context/ListContext';
 import { createStatus } from '../../../Services/StatusService';
 import { ToastContext } from '../../../Context/ToastContext';
+import './ListOfTasks.scss';
 
 export default function CreateStatusModal() {
 
@@ -16,6 +16,8 @@ export default function CreateStatusModal() {
   const toastContext = useContext(ToastContext);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  // useState for validating what user enters
+  const [validatedTitle, setValidatedTitle] = useState(false);
 
   const { register, handleSubmit, reset } = useForm(
     {
@@ -32,20 +34,30 @@ export default function CreateStatusModal() {
 
   const handleShowCreateModal = () => setShowCreateModal(true);
 
-  const onHandleSubmit = (value: any) => {
-    const newStatus: StatusModel = {
-      id: 0,
-      statusName: value.statusName,
-      listOfTasksId: listContext.currentList.id
-    };
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-    createStatus(newStatus).then(() => {
-      toastContext.setMessage(`Status '${value.statusName}' was created!`);
-      toastContext.setToastState(true);
-      listContext.fetchCurrentListData();
-      setShowCreateModal(false);
-      reset();
-    })
+  const titleRegex: RegExp = /^.{1,20}$/;
+
+  const onHandleSubmit = (value: any) => {
+    if (titleRegex.test(value.statusName.toString())) {
+      const newStatus: StatusModel = {
+        id: 0,
+        statusName: value.statusName,
+        listOfTasksId: listContext.currentList.id
+      };
+
+      createStatus(newStatus).then(() => {
+        toastContext.setMessage(`Status '${value.statusName}' was created!`);
+        toastContext.setToastState(true);
+        listContext.fetchCurrentListData();
+        setShowCreateModal(false);
+        reset();
+      })
+    }
+    else {
+      setValidatedTitle(true);
+      sleep(5000).then(() => { setValidatedTitle(false) });
+    }
   }
 
   return (
@@ -70,11 +82,14 @@ export default function CreateStatusModal() {
               <Form.Control
                 placeholder="Input name here"
                 autoFocus
-                pattern="^.{2,40}$"
                 required={true}
                 defaultValue=''
-                {...register("statusName", { required: "Required" })}
+                isInvalid={validatedTitle}
+                {...register("statusName")}
               />
+              <Form.Control.Feedback type="invalid">
+                The field must contain between 1 and 20 characters
+              </Form.Control.Feedback>
             </Form.Group>
 
           </Modal.Body>
